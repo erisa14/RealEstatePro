@@ -1,12 +1,8 @@
 ﻿using DAL.DI;
 using Domain.Concrete;
 using Domain.Contracts;
-using Entities.Models;
 using Lamar;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,14 +17,7 @@ namespace Domain.DI
         {
             IncludeRegistry<DomainUnitOfWorkRegistry>();
 
-            For<IUserDomain>().Use<UserDomain>();
-
-
-            For<UserManager<User>>().Use(ctx => ctx.GetInstance<IHttpContextAccessor>().HttpContext.RequestServices
-            .GetRequiredService<UserManager<User>>());
-            For<SignInManager<User>>().Use(ctx => ctx.GetInstance<IHttpContextAccessor>().HttpContext.RequestServices
-            .GetRequiredService<SignInManager<User>>());
-
+            For<IPropertyDomain>().Use<PropertyDomain>();
 
             AddRepositoryRegistries();
             AddHttpContextRegistries();
@@ -45,3 +34,4 @@ namespace Domain.DI
         }
     }
 }
+

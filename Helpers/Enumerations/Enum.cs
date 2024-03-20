@@ -4,17 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Helpers
+namespace Helpers.Enumerations
 {
-   public enum Status
+    internal class Enum
     {
-        Active = 1,
-        Inactive = 2
-    }
-    public enum UserRole
-    {
-        Admin,
-        Seller,
-        Buyer
     }
 }

@@ -1,18 +1,16 @@
-﻿using System;
+﻿using Domain.UoW;
+using Lamar;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Domain.UoW;
-using Lamar;
 
-namespace Domain.DI
+public class DomainUnitOfWorkRegistry : ServiceRegistry
 {
-    public class DomainUnitOfWorkRegistry : ServiceRegistry
+    public DomainUnitOfWorkRegistry()
     {
-        public DomainUnitOfWorkRegistry()
-        {
-            For<IDomainUnitOfWork>().Use<DomainUnitOfWork>();
-        }
+        For<IDomainUnitOfWork>().Use<DomainUnitOfWork>();
     }
 }
+
