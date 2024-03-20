@@ -11,7 +11,7 @@ namespace DAL.Concrete
     internal class UserRepository : BaseRepository<User, Guid>, IUserRepository
     {
 
-        public UserRepository(RecrutimentContext dbContext) : base(dbContext)
+        public UserRepository(RealEstateContext dbContext) : base(dbContext)
         {
         }
 
@@ -23,6 +23,4 @@ namespace DAL.Concrete
 
 
     }
-
-
 }

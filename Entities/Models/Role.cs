@@ -12,7 +12,6 @@ namespace Entities.Models
 
         public Guid RoleId { get; set; }
         public string RoleName { get; set; } = null!;
-        public string? Description { get; set; }
 
         public virtual ICollection<User> Users { get; set; }
     }

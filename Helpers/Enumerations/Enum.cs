@@ -11,4 +11,10 @@ namespace Helpers
         Active = 1,
         Inactive = 2
     }
+    public enum UserRole
+    {
+        Admin,
+        Seller,
+        Buyer
+    }
 }

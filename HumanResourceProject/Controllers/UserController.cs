@@ -1,5 +1,7 @@
 ﻿using Domain.Contracts;
 using DTO.UserDTO;
+using Entities.Models;
+using Helpers;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HumanResourceProject.Controllers
@@ -66,6 +68,32 @@ namespace HumanResourceProject.Controllers
             {
                 throw ex;
             }
+        }
+
+
+        [HttpPost]
+        [Route("register")]
+        public async Task<IActionResult> Register(RegisterDto register, UserRole role)
+        {
+            var result=await _userDomain.RegisterUserAsync(register, role);
+            if (result.Succeeded)
+            {
+                return Ok("User registered successfully!");
+            }
+
+            return BadRequest(result.Errors);
+        }
+
+        [HttpPost]
+        [Route("login")]
+        public async Task<IActionResult> Login(LoginDto loginDto)
+        {
+            var token = await _userDomain.LoginUserAsync(loginDto);
+            if (token != null)
+            {
+                return Ok(new { Token = token });
+            }
+            return Unauthorized("Invalid");
         }
     }
 }

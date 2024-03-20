@@ -1,4 +1,6 @@
 ﻿using DTO.UserDTO;
+using Helpers;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,5 +13,8 @@ namespace Domain.Contracts
     {
         IList<UserDTO> GetAllUsers();
         UserDTO GetUserById(Guid id);
+
+        Task<IdentityResult> RegisterUserAsync(RegisterDto model, UserRole role);
+        Task<string?> LoginUserAsync(LoginDto model);
     }
 }
