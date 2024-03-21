@@ -10,7 +10,6 @@ namespace DAL.Contracts
     public interface IPropertyRepository : IRepository<Property, Guid>
     {
         Property GetById(Guid id);
-        Property AddProperty(Property property);
         void DeleteProperty(Guid id);
     }
 }

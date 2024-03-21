@@ -54,9 +54,33 @@ namespace Domain.Concrete
             return propertyDTOs;
         }
 
-        public PropertyDTO AddProperty(PropertyDTO property)
+
+
+
+        public static List<Property> properties = new List<Property>();
+
+        public List<Property> AddProperty(PropertyDTO propertyDTO)
         {
-            throw new NotImplementedException();
+            // Create a new Property object using the provided PropertyDTO
+            var newProperty = new Property()
+            {
+                PropertyId = Guid.NewGuid(),
+                CategoryType = propertyDTO.CategoryType,
+                Location = propertyDTO.Location,
+                Price = propertyDTO.Price,
+                SquareArea = propertyDTO.SquareArea,
+                NumberOfFloors = propertyDTO.NumberOfFloors,
+                Description = propertyDTO.Description,
+                PhotoId = propertyDTO.PhotoId,
+            };
+
+            // Add the new property to the properties list
+            properties.Add(newProperty);
+
+            return properties;
         }
+
+     
     }
 }
+

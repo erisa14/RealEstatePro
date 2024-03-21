@@ -1,4 +1,5 @@
 ﻿using DTO.PropertyDTO;
+using Entities.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,8 +14,8 @@ namespace Domain.Contracts
         PropertyDTO GetPropertyById(Guid id);
         IList<PropertyDTO> GetAllPropertiesByCategory();
         IList<PropertyDTO> GetAllPropertiesByPrice(decimal minPrice, decimal maxPrice);
-        PropertyDTO AddProperty(PropertyDTO property);
 
+        List<Property> AddProperty(PropertyDTO propertyDTO);
 
     }
 }

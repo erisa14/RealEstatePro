@@ -37,12 +37,5 @@ namespace DAL.Concrete
             }
         }
 
-        public Property AddProperty(Property property)
-        {
-
-            context.Add(property);
-            return property;
-        }
-
     }
 }

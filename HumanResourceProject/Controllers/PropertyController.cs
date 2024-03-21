@@ -5,6 +5,8 @@ using Entities;
 using Entities.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Hosting;
+using System.Data;
 
 namespace RealEstatePro.Controllers
 {
@@ -20,6 +22,7 @@ namespace RealEstatePro.Controllers
         }
 
 
+        private static List<Property> properties = new List<Property>();
 
 
         [HttpGet]
@@ -164,28 +167,20 @@ namespace RealEstatePro.Controllers
 
         [HttpPost]
         [Route("addProperty")]
-        public IActionResult AddProperty([FromRoute] Guid propertyId)
+        public IActionResult AddProperty(PropertyDTO propertyDTO)
         {
-            try
+            if (ModelState.IsValid)
             {
-                if (!ModelState.IsValid)
-                    return BadRequest();
-                var propertyToDelete = _propertyDomain.GetPropertyById(propertyId);
-
-                if (propertyToDelete != null)
-                    return Ok(propertyToDelete);
-
-                return NotFound();
+                // Call the AddProperty method from PropertyDomain to add the property
+                var result = _propertyDomain.AddProperty(propertyDTO);
+                return Ok(result); // Return OK if property is successfully added
             }
 
-            catch (Exception ex)
-            {
-                throw ex;
-            }
+            return BadRequest("Invalid property data"); // Return BadRequest if model state is not valid
         }
     }
-}
 
+}
 
 
 
