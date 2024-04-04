@@ -14,6 +14,7 @@ namespace Entities.Models
         public Guid PhotoId { get; set; }
         public byte[] Photos { get; set; } = null!;
 
+
         public virtual ICollection<Property> Properties { get; set; }
     }
 }
