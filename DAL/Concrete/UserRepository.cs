@@ -1,10 +1,8 @@
 ﻿using DAL.Contracts;
 using Entities.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using StructureMap;
+
 
 namespace DAL.Concrete
 {
@@ -21,6 +19,30 @@ namespace DAL.Concrete
             return user;
         }
 
+        public User GetByEmail(string email)
+        {
+            var user= context.Where(a=> a.Email == email).FirstOrDefault();
+            return user;
+        }
 
+        public void AddUserWithRoles(User user, IEnumerable<UserRole> roles)
+        {
+            context.Add(user);
+
+            foreach (var role in roles)
+            {
+                user.UserRoles.Add(role);
+            }
+        }
+
+
+
+        public async Task<List<User>> GetUsersByRoleAsync(int roleId)
+        {
+            var users = await context.Where(u => u.UserRoles.Any(ur => ur.RoleId == roleId))
+                             .ToListAsync();
+
+            return users;
+        }
     }
 }

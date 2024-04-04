@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Helpers;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,12 +10,32 @@ namespace DTO.UserDTO
 {
     public class UserDTO
     {
-        // public Guid UserId { get; set; }
-        public string FirstName { get; set; } = null!;
+        [Required(ErrorMessage = "Name is required")]
+        public string Name { get; set; } = null!;
+
+        [Required(ErrorMessage = "Last Name is required")]
+        public string? LastName { get; set; }
+
+        [Required(ErrorMessage = "UserName is required")]
         public string Username { get; set; } = null!;
-        //public string LastName { get; set; } = null!;
-        ////public DateTime Dob { get; set; }
-        //public string Password { get; set; } = null!;
-        //public int Status { get; set; }
+
+        [EmailAddress]
+        [Required(ErrorMessage = "Email is required")]
+        public string Email { get; set; } = null!;
+
+
+        
+        public string CurrentPassword { get; set; }
+
+
+        public string NewPassword { get; set; }
+
+
+        public string ConfirmPassword { get; set; }
+
+
+        [Required(ErrorMessage = "Role is required")]
+        public List<RoleName> Roles { get; set; }
+
     }
 }

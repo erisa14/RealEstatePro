@@ -5,26 +5,29 @@ using Domain.Contracts;
 using DTO.UserDTO;
 using Entities.Models;
 using Helpers;
+using Helpers.JwToken;
+using Lamar.IoC.Instances;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Authentication;
 using System.Security.Claims;
-using System.Text;
 
 
 namespace Domain.Concrete
 {
     public class UserDomain : DomainBase, IUserDomain
     {
-        public UserDomain(IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor)
+        private readonly Jwt _jwt;
+        private readonly ClaimsPrincipal _user;
+        public UserDomain(IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor, IConfiguration configuration, ClaimsPrincipal user)
             : base(unitOfWork, mapper, httpContextAccessor)
         {
+            _jwt = new Jwt(configuration);
+            _user = user;
         }
 
         private IUserRepository userRepository => _unitOfWork.GetRepository<IUserRepository>();
+        private IRoleRepository roleRepository => _unitOfWork.GetRepository<IRoleRepository>();
+
         public IList<UserDTO> GetAllUsers()
         {
             IEnumerable<User> user = userRepository.GetAll();
@@ -38,61 +41,96 @@ namespace Domain.Concrete
             return _mapper.Map<UserDTO>(user);
         }
 
-        public async Task<string?> LoginUserAsync(LoginDto model)
+        public UserDTO GetUserByEmail(string email)
         {
-            //kontrollojme nese useri ekziston
-            // krijo nje method ne repository
-
-            // JWT token
-            //        var authClaims = new List<Claim>
-            //{
-            //    new Claim(ClaimTypes.Name, user.Email),
-            //    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            //};
-
-            // Shtojme rolet
-            // TODO: krijo method per getroles
-            //var userRoles = await _userManager.GetRolesAsync(user);
-            //authClaims.AddRange(userRoles.Select(role => new Claim(ClaimTypes.Role, role)));
-
-            //var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
-            //var token = new JwtSecurityToken(
-            //    issuer: _configuration["JWT:ValidIssuer"],
-            //    audience: _configuration["JWT:ValidAudience"],
-            //    expires: DateTime.Now.AddHours(3),
-            //    claims: authClaims,
-            //    signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
-            //);
-
-            //return new JwtSecurityTokenHandler().WriteToken(token);
-            return null;
+            User user = userRepository.GetByEmail(email);
+            return _mapper.Map<UserDTO>(user);
         }
 
-        public async Task<IdentityResult> RegisterUserAsync(RegisterDto model, UserRole role)
+        private User getUser(string userId)
         {
-            //    //Kontrollojme nese nje user me kete email ekziston ne db
-            //    var userExists = await _userManager.FindByEmailAsync(model.Email);
-            //    if (userExists != null)
-            //    {
-            //        return IdentityResult.Failed(new IdentityError { Description = "A user with this email already exists!" });
-            //    }
+            var user = userRepository.GetById(Guid.Parse(userId));
+            if (user == null) throw new UnauthorizedAccessException("User not found.");
+            return user;
+        }
 
-            //    var user = new User
-            //    {
-            //        Username = model.UserName,
-            //        Name=model.FirstName,
-            //        LastName=model.LastName,
-            //        Email=model.Email
-            //    };
+        public async Task UpdateUser(ClaimsPrincipal userClaims, UserDTO userDTO)
+        {
+            var userId = userClaims.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null) throw new UnauthorizedAccessException("User not found.");
 
-            //   var result= await _userManager.CreateAsync(user, model.Password);
-            //    if (result.Succeeded)
-            //    {
-            //        await _userManager.AddToRoleAsync(user, role.ToString());
-            //    }
-            //    return result;
-            //}
-            return null;
+            var user = getUser(userId);
+
+            _mapper.Map(userDTO, user);
+
+            if(!string.IsNullOrEmpty(userDTO.NewPassword)&& !string.IsNullOrEmpty(userDTO.ConfirmPassword))
+            {
+                if (!VerifyPassword(userDTO.CurrentPassword, user.Password))
+                {
+                    throw new UnauthorizedAccessException("Current password is incorrect.");
+                }
+
+                if (userDTO.NewPassword != userDTO.ConfirmPassword)
+                {
+                    throw new ArgumentException("New password and confirm password do not match.");
+                }
+                string newPasswordHash = BCrypt.Net.BCrypt.HashPassword(userDTO.NewPassword);
+                user.Password = newPasswordHash;
+            }
+
+            foreach (var roleEnum in userDTO.Roles)
+            {
+                  AddRoleToUser(user, roleEnum);
+            };
+
+            userRepository.Update(user);
+            _unitOfWork.Save();
+        }
+
+        private async Task AddRoleToUser(User user, RoleName roleEnum)
+        {
+            var roleName = Enum.GetName(typeof(RoleName), roleEnum);
+            user.UserRoles.Add(new UserRole { UserId = user.UserId, RoleId = (int)roleEnum });
+            _unitOfWork.Save();
+        }
+
+        public bool VerifyPassword(string providedPassword, string storedHash)
+        {
+            return BCrypt.Net.BCrypt.Verify(providedPassword, storedHash);
+        }
+        public async Task<List<User>> GetUsersByRole(int roleId)
+        {
+            return await userRepository.GetUsersByRoleAsync(roleId);
+
+        }
+
+        public async Task RemoveRoleFromUser(ClaimsPrincipal userClaims, int roleId)
+        {
+            var userId = userClaims.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null) throw new UnauthorizedAccessException("User not found.");
+
+            var user =  userRepository.GetById(Guid.Parse(userId));
+            if (user == null) throw new Exception("User not found.");
+
+            var role =  roleRepository.GetById(roleId);
+            if (role == null) throw new Exception("Role not found.");
+
+            user.UserRoles.Remove(role);
+
+            userRepository.Update(user);
+            _unitOfWork.Save();
+        }
+
+        public async Task DeleteUserAccount(ClaimsPrincipal userClaims)
+        {
+            var userId = userClaims.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null) throw new UnauthorizedAccessException("User not found.");
+
+            var user =  userRepository.GetById(Guid.Parse(userId));
+            if (user == null) throw new Exception("User not found.");
+
+            userRepository.Remove(user);
+            _unitOfWork.Save();
         }
     }
 }

@@ -22,13 +22,8 @@ namespace Domain.DI
             IncludeRegistry<DomainUnitOfWorkRegistry>();
 
             For<IUserDomain>().Use<UserDomain>();
-
-
-            For<UserManager<User>>().Use(ctx => ctx.GetInstance<IHttpContextAccessor>().HttpContext.RequestServices
-            .GetRequiredService<UserManager<User>>());
-            For<SignInManager<User>>().Use(ctx => ctx.GetInstance<IHttpContextAccessor>().HttpContext.RequestServices
-            .GetRequiredService<SignInManager<User>>());
-
+            For<IAuthDomain>().Use<AuthDomain>();
+           
 
             AddRepositoryRegistries();
             AddHttpContextRegistries();

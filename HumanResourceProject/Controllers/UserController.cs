@@ -2,7 +2,9 @@
 using DTO.UserDTO;
 using Entities.Models;
 using Helpers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace HumanResourceProject.Controllers
 
@@ -12,6 +14,7 @@ namespace HumanResourceProject.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserDomain _userDomain;
+
 
         public UserController(IUserDomain userDomain)
         {
@@ -49,7 +52,7 @@ namespace HumanResourceProject.Controllers
 
 
         [HttpGet]
-        [Route("{userId}")]
+        [Route("getUserById/{userId}")]
         public IActionResult GetUserById([FromRoute] Guid userId)
         {
             try
@@ -70,30 +73,90 @@ namespace HumanResourceProject.Controllers
             }
         }
 
+        [Authorize]
+        [HttpPut("update")]
+        public async Task<IActionResult> UpdateUser([FromBody] UserDTO userDTO)
+        {
+            
+                await _userDomain.UpdateUser(User, userDTO);
+                return Ok(); 
+        }
 
+
+        [Authorize]
+        [HttpPost("remove/role")]
+        public async Task<IActionResult> RemoveRoleFromUser([FromBody] int roleId)
+        {
+            try
+            {
+                await _userDomain.RemoveRoleFromUser(User, roleId);
+                return Ok();
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return NotFound(new { message = "User not found." });
+            }
+        }
+
+        [Authorize]
+        [HttpPost("delete")]
+        public async Task<IActionResult> DeleteUser()
+        {
+            try
+            {
+                await _userDomain.DeleteUserAccount(User);
+                return Ok();
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                // Log the exception if necessary
+                return NotFound(new { message = "User not found." });
+            }
+        }
+
+
+
+        /*
         [HttpPost]
         [Route("register")]
-        public async Task<IActionResult> Register(RegisterDto register, UserRole role)
+        public async Task<IActionResult> Register([FromBody] RegisterDto request)
         {
-            var result=await _userDomain.RegisterUserAsync(register, role);
-            if (result.Succeeded)
+            try
             {
-                return Ok("User registered successfully!");
+                await _userDomain.Register(request);
+                return Ok("User registered!");
             }
-
-            return BadRequest(result.Errors);
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpPost]
         [Route("login")]
-        public async Task<IActionResult> Login(LoginDto loginDto)
+        public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
-            var token = await _userDomain.LoginUserAsync(loginDto);
-            if (token != null)
+            var response = await _userDomain.Login(loginDto);
+
+            
+            if (response != null)
             {
-                return Ok(new { Token = token });
+                return Ok(response);
+
             }
-            return Unauthorized("Invalid");
+
+            return BadRequest(new { message = "User login unsuccessful" });
+        }
+
+        */
+
+
+        [HttpGet]
+        [Route("getUserByRole/{roleId}")]
+        public async Task<ActionResult<List<User>>> GetUsersByRoleAsync(int roleId)
+        {
+            var users = await _userDomain.GetUsersByRole(roleId);
+            return users;
         }
     }
 }

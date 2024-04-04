@@ -11,10 +11,10 @@ namespace Helpers
         Active = 1,
         Inactive = 2
     }
-    public enum UserRole
+    public enum RoleName
     {
-        Admin,
-        Seller,
-        Buyer
+        Admin=1,
+        Seller=2,
+        Buyer=3
     }
 }

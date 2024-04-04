@@ -12,7 +12,7 @@ namespace DTO.UserDTO
     public class RegisterDto
     {
         [Required(ErrorMessage ="Name is required")]
-        public string? FirstName { get; set; }
+        public string? Name { get; set; }
 
         [Required(ErrorMessage = "Last Name is required")]
         public string? LastName { get; set; }
@@ -23,12 +23,13 @@ namespace DTO.UserDTO
 
 
         [Required(ErrorMessage = "UserName is required")]
-        public string? UserName { get; set; }
+        public string? Username { get; set; }
 
         [Required(ErrorMessage = "Password is required")]
         public string Password { get; set; }
 
-        [Required(ErrorMessage = "Role is required")]
-        public UserRole Role { get; set; }
+
+        [Required(ErrorMessage ="Role is required")]
+        public List<RoleName> Roles { get; set; }
     }
 }

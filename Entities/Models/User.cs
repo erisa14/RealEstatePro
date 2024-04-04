@@ -8,8 +8,8 @@ namespace Entities.Models
         public User()
         {
             Notifications = new HashSet<Notification>();
+            UserRoles = new HashSet<UserRole>();
             Properties = new HashSet<Property>();
-            Roles = new HashSet<Role>();
         }
 
         public Guid UserId { get; set; }
@@ -20,8 +20,8 @@ namespace Entities.Models
         public string? Password { get; set; }
 
         public virtual ICollection<Notification> Notifications { get; set; }
+        public virtual ICollection<UserRole> UserRoles { get; set; }
 
         public virtual ICollection<Property> Properties { get; set; }
-        public virtual ICollection<Role> Roles { get; set; }
     }
 }
