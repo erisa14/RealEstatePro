@@ -10,6 +10,7 @@ namespace Entities.Models
             Properties = new HashSet<Property>();
         }
 
+
         public Guid PhotoId { get; set; }
         public byte[] Photos { get; set; } = null!;
 
