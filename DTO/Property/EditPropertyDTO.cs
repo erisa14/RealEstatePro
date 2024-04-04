@@ -1,16 +1,20 @@
-﻿using System;
+﻿using Helpers.Enumerations;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DTO.PropertyDTO
+namespace DTO.Property
 {
-    public class PropertyDTO
+    public class EditPropertyDTO
     {
+        [Required]
+        public Guid Id { get; set; }
+
         [Required(ErrorMessage = "Please enter the category!")]
-        public int CategoryType { get; set; }
+        public CategoryEnum.CategoryName CategoryType { get; set; }
 
         [Required(ErrorMessage = "Please enter the location!")]
         public string Location { get; set; } = null!;
@@ -29,8 +33,7 @@ namespace DTO.PropertyDTO
 
         //public int Status { get; set; }
 
-        [Required(ErrorMessage = "Please upload at least 5 photos!")]
-        public Guid PhotoId { get; set; }
-
+        //  [Required(ErrorMessage = "Please upload at least 5 photos!")]
+        // public Guid PhotoId { get; set; }
     }
 }

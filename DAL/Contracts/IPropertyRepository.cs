@@ -1,4 +1,6 @@
-﻿using Entities.Models;
+﻿using DTO.Property;
+using Entities.Models;
+using Helpers.Enumerations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +12,8 @@ namespace DAL.Contracts
     public interface IPropertyRepository : IRepository<Property, Guid>
     {
         Property GetById(Guid id);
-        void DeleteProperty(Guid id);
-    }
+        Task <List<Property>> GetPropertiesByCategory(CategoryEnum.CategoryName categoryName);
+
+        Task<List<Property>> GetPropertiesByPrice(decimal minPrice, decimal maxPrice);
+   }
 }

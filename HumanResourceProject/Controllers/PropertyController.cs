@@ -1,8 +1,10 @@
 ﻿using DAL.Contracts;
 using Domain.Contracts;
-using DTO.PropertyDTO;
+using DTO;
+using DTO.Property;
 using Entities;
 using Entities.Models;
+using Helpers.Enumerations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
@@ -81,68 +83,29 @@ namespace RealEstatePro.Controllers
 
 
         [HttpGet]
-        [Route("getAllPropertiesByCategory")]
-        public IActionResult GetAllPropertiesByCategory()
-
+        [Route("getAllPropertiesByCategory/{categoryName}")]
+        public async Task<ActionResult<List<Property>>> GetAllPropertiesByCategory(CategoryEnum.CategoryName categoryName)
         {
 
-            try
-            {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest();
-                }
-
-                var properties = _propertyDomain.GetAllPropertiesByCategory();
-
-                if (properties != null)
-                {
-                    return Ok(properties);
-                }
-                else
-                {
-                    return NotFound();
-                }
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex);
-            }
+           var properties= await _propertyDomain.GetPropertyByCategory(categoryName);
+            return properties;
         }
 
 
 
         [HttpGet]
         [Route("getAllPropertiesByPrice")]
-        public IActionResult GetAllPropertiesByPrice(decimal minPrice, decimal maxPrice)
+        public async Task<ActionResult<List<Property>>> GetAllPropertiesByPrice(decimal minPrice, decimal maxPrice)
 
-        {
+        { 
+            var properties =await _propertyDomain.GetAllPropertiesByPrice(minPrice, maxPrice);
+            return properties;
 
-            try
-            {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest();
-                }
 
-                var property = _propertyDomain.GetAllPropertiesByPrice(2, 3);
-
-                if (property != null)
-                {
-                    return Ok(property);
-                }
-                else
-                {
-                    return NotFound();
-                }
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex);
-            }
+           
         }
 
-
+        /*
         [HttpPost]
         [Route("deleteProperty")]
         public IActionResult DeletePropertyById([FromRoute] Guid propertyId)
@@ -164,22 +127,88 @@ namespace RealEstatePro.Controllers
                 throw ex;
             }
         }
+        */
+
+
+        
+        [HttpDelete]
+        [Route("deleteProperty")]
+        public async Task<IActionResult> DeleteProperty(Guid PropertyId)
+        {
+           await _propertyDomain.DeleteProperty(PropertyId);
+            return Ok();
+        }
+
 
         [HttpPost]
         [Route("addProperty")]
-        public IActionResult AddProperty(PropertyDTO propertyDTO)
+        public async Task<IActionResult> AddProperty([FromBody]PropertyDTO propertyDTO)
+        {
+            try
+            {
+                await _propertyDomain.AddProperty(propertyDTO);
+                return Ok("Property registered!");
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+
+        }
+
+
+
+       
+        
+        [HttpPost]
+        [Route("editProperty")]
+        public IActionResult EditProperty(EditPropertyDTO propertyDTO)
         {
             if (ModelState.IsValid)
             {
-                // Call the AddProperty method from PropertyDomain to add the property
-                var result = _propertyDomain.AddProperty(propertyDTO);
-                return Ok(result); // Return OK if property is successfully added
+                try
+                {
+                    var result = _propertyDomain.EditProperty(propertyDTO);
+                    return Ok(result);
+                }
+                catch (ArgumentException ex)
+                {
+                    return NotFound(ex.Message);
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(500, $"Internal server error: {ex.Message}");
+                }
             }
 
-            return BadRequest("Invalid property data"); // Return BadRequest if model state is not valid
+            return BadRequest("Invalid property data");
+        }
+        
+
+        [HttpPost]
+        [Route("uploadFile")]
+        public Response UploadFile([FromForm]FileModel fileModel)
+        {
+            Response response = new Response();
+            try
+            {
+                string path = Path.Combine(@"C:\\Users\\User\\Desktop\\New folder (2)", fileModel.FileName);
+                using(Stream stream = new FileStream(path, FileMode.Create))
+                {
+                    fileModel.file.CopyTo(stream);
+                }
+                response.StatusCode = 200;
+                response.ErrorMessage="Image created succesfully";
+            }
+            catch (Exception ex)
+            {
+                response.StatusCode = 100;
+                response.ErrorMessage="Some error occurred"+ ex.Message;
+            }
+            return response;
+
         }
     }
-
 }
 
 

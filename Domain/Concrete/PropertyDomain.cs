@@ -2,8 +2,9 @@
 using DAL.Contracts;
 using DAL.UoW;
 using Domain.Contracts;
-using DTO.PropertyDTO;
+using DTO.Property;
 using Entities.Models;
+using Helpers.Enumerations;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -33,54 +34,51 @@ namespace Domain.Concrete
             return _mapper.Map<PropertyDTO>(property);
         }
 
-        public IList<PropertyDTO> GetAllPropertiesByCategory()
+        public async Task<List<Property>> GetAllPropertiesByPrice(decimal minPrice, decimal maxPrice)
         {
-            IEnumerable<Property> property = propertyRepository.GetAll();
-            var allPropertiesByCategory = _mapper.Map<IList<PropertyDTO>>(property);
-            return allPropertiesByCategory;
+          return await propertyRepository.GetPropertiesByPrice(minPrice, maxPrice);
         }
-
-        public IList<PropertyDTO> GetAllPropertiesByPrice(decimal minPrice, decimal maxPrice)
-        {
-            // Get all properties from the repository
-            IEnumerable<Property> property = propertyRepository.GetAll();
-
-            // Filter properties based on price range
-            property = property.Where(p => p.Price >= minPrice && p.Price <= maxPrice);
-
-            // Map the filtered properties to DTOs
-            var propertyDTOs = _mapper.Map<IList<PropertyDTO>>(property);
-
-            return propertyDTOs;
-        }
-
-
-
 
         public static List<Property> properties = new List<Property>();
 
-        public List<Property> AddProperty(PropertyDTO propertyDTO)
+        public async Task  AddProperty(PropertyDTO propertyDTO)
         {
-            // Create a new Property object using the provided PropertyDTO
-            var newProperty = new Property()
-            {
-                PropertyId = Guid.NewGuid(),
-                CategoryType = propertyDTO.CategoryType,
-                Location = propertyDTO.Location,
-                Price = propertyDTO.Price,
-                SquareArea = propertyDTO.SquareArea,
-                NumberOfFloors = propertyDTO.NumberOfFloors,
-                Description = propertyDTO.Description,
-                PhotoId = propertyDTO.PhotoId,
-            };
+            var propertyMap=_mapper.Map<Property>(propertyDTO);
 
-            // Add the new property to the properties list
-            properties.Add(newProperty);
+            propertyMap.PropertyId = Guid.NewGuid();
 
-            return properties;
+            propertyMap.CategoryType =propertyDTO.CategoryType.ToString();
+
+            var result = propertyRepository.Add(propertyMap);
+            _unitOfWork.Save();
         }
 
-     
+        public async Task DeleteProperty(Guid id)
+        {
+            propertyRepository.Remove(id); 
+             _unitOfWork.Save();
+        }
+
+        public async Task EditProperty(EditPropertyDTO propertyDTO)
+        {
+            var existingProperty =  propertyRepository.GetById(propertyDTO.Id);
+            if (existingProperty == null)
+            {
+                throw new Exception("Property not found");
+            }
+
+            // Map the DTO to the entity
+            _mapper.Map(propertyDTO, existingProperty);
+
+            // Save changes to the database
+             _unitOfWork.Save();
+        }
+
+        public async Task<List<Property>>GetPropertyByCategory(CategoryEnum.CategoryName category)
+        {
+            return await propertyRepository.GetPropertiesByCategory(category);
+        }
     }
 }
+
 

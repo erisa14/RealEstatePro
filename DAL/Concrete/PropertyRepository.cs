@@ -1,11 +1,11 @@
 ﻿using DAL.Contracts;
+using DTO.Property;
 using Entities.Models;
+using Helpers.Enumerations;
 using Microsoft.EntityFrameworkCore;
+using StructureMap;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DAL.Concrete
 {
@@ -14,28 +14,33 @@ namespace DAL.Concrete
 
         public PropertyRepository(RealEstateContext dbContext) : base(dbContext)
         {
-
         }
+
+      
+
         public Property GetById(Guid id)
         {
-            var property = context.Where(a => a.PropertyId == id).FirstOrDefault();
+            var property = context.FirstOrDefault(a => a.PropertyId == id);
             return property;
         }
 
 
-
-        void IPropertyRepository.DeleteProperty(Guid id)
+        public async Task<List<Property>> GetPropertiesByCategory(CategoryEnum.CategoryName categoryName)
         {
-            var propertyToDelete = context.FirstOrDefault(p => p.PropertyId == id);
-            if (propertyToDelete != null)
-            {
-                context.Remove(propertyToDelete);
-            }
-            else
-            {
-                throw new ArgumentException($"Property with ID {id} not found");
-            }
+            // Convert the enum to its string representation
+            string categoryString = categoryName.ToString();
+
+            // Query the database to get properties by the category string
+            var properties = await context.Where(p => p.CategoryType == categoryString) // Correctly reference the CategoryType property
+                .ToListAsync();
+
+            return properties;
         }
 
+        public async Task<List<Property>> GetPropertiesByPrice(decimal minPrice, decimal maxPrice)
+        {
+            var properties= await context.Where(p => p.Price >= minPrice && p.Price <= maxPrice).ToListAsync();
+            return properties;
+        }
     }
 }

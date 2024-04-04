@@ -89,7 +89,6 @@ namespace Entities.Models
                 entity.HasOne(d => d.Photo)
                     .WithMany(p => p.Properties)
                     .HasForeignKey(d => d.PhotoId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_PhotoId");
             });
 
@@ -150,7 +149,7 @@ namespace Entities.Models
                         r => r.HasOne<User>().WithMany().HasForeignKey("UserId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__UserPrope__UserI__398D8EEE"),
                         j =>
                         {
-                            j.HasKey("UserId", "PropertyId").HasName("PK__UserProp__5084563F8B776668");
+                            j.HasKey("UserId", "PropertyId").HasName("PK__UserProp__5084563F4CDE4D28");
 
                             j.ToTable("UserProperty");
                         });
@@ -163,7 +162,7 @@ namespace Entities.Models
                         r => r.HasOne<User>().WithMany().HasForeignKey("UserId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__User_Role__UserI__37A5467C"),
                         j =>
                         {
-                            j.HasKey("UserId", "RoleId").HasName("PK__User_Rol__AF2760AD913FED4C");
+                            j.HasKey("UserId", "RoleId").HasName("PK__User_Rol__AF2760AD43E0C3C8");
 
                             j.ToTable("User_Roles");
                         });
