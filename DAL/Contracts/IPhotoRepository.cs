@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace DAL.Contracts
 {
-    internal interface IPhotoRepository : IRepository<Photo, Guid>
+    public interface IPhotoRepository : IRepository<Photo, Guid>
     {
-        IEnumerable<Photo>propertyPhotos(Guid photoid);
+        int  CountByPropertyId(Guid propertyId);
 
     }
 }

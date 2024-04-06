@@ -7,8 +7,8 @@ using Entities.Models;
 using Helpers.Enumerations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Hosting;
 using System.Data;
+using System.IO;
 
 namespace RealEstatePro.Controllers
 {
@@ -17,10 +17,13 @@ namespace RealEstatePro.Controllers
     public class PropertyController : ControllerBase
     {
         private readonly IPropertyDomain _propertyDomain;
+        private readonly IPhotoDomain _photoDomain;
 
-        public PropertyController(IPropertyDomain propertyDomain)
+
+        public PropertyController(IPropertyDomain propertyDomain, IPhotoDomain photoDomain)
         {
             _propertyDomain = propertyDomain;
+            _photoDomain = photoDomain;
         }
 
 
@@ -155,10 +158,6 @@ namespace RealEstatePro.Controllers
             }
 
         }
-
-
-
-       
         
         [HttpPost]
         [Route("editProperty")]
@@ -183,30 +182,21 @@ namespace RealEstatePro.Controllers
 
             return BadRequest("Invalid property data");
         }
-        
 
         [HttpPost]
-        [Route("uploadFile")]
-        public Response UploadFile([FromForm]FileModel fileModel)
+        public async Task<IActionResult> AddPhotoAsync([FromForm] PhotoDTO photoDTO)
         {
-            Response response = new Response();
-            try
+            if(ModelState.IsValid)
             {
-                string path = Path.Combine(@"C:\\Users\\User\\Desktop\\New folder (2)", fileModel.FileName);
-                using(Stream stream = new FileStream(path, FileMode.Create))
-                {
-                    fileModel.file.CopyTo(stream);
-                }
-                response.StatusCode = 200;
-                response.ErrorMessage="Image created succesfully";
-            }
-            catch (Exception ex)
-            {
-                response.StatusCode = 100;
-                response.ErrorMessage="Some error occurred"+ ex.Message;
-            }
-            return response;
+                await _photoDomain.UploadImageAsync(photoDTO);
+                return Ok("Image uploaded successfully.");
 
+               // return NoContent();
+            }
+            else
+            {
+                return BadRequest();
+            }
         }
     }
 }

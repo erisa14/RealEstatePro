@@ -27,11 +27,9 @@ namespace DAL.Concrete
 
         public async Task<List<Property>> GetPropertiesByCategory(CategoryEnum.CategoryName categoryName)
         {
-            // Convert the enum to its string representation
             string categoryString = categoryName.ToString();
 
-            // Query the database to get properties by the category string
-            var properties = await context.Where(p => p.CategoryType == categoryString) // Correctly reference the CategoryType property
+            var properties = await context.Where(p => p.CategoryType == categoryString)  
                 .ToListAsync();
 
             return properties;

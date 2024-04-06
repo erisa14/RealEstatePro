@@ -18,6 +18,8 @@ namespace Domain.DI
             IncludeRegistry<DomainUnitOfWorkRegistry>();
 
             For<IPropertyDomain>().Use<PropertyDomain>();
+            For<IPhotoDomain>().Use<PhotoDomain>();
+
 
             AddRepositoryRegistries();
             AddHttpContextRegistries();

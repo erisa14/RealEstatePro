@@ -14,10 +14,11 @@ namespace DAL.Concrete
         public PhotoRepository(RealEstateContext dbContext) : base(dbContext)
         {
         }
-        public IEnumerable<Photo>propertyPhotos(Guid photoid)
+
+        public int CountByPropertyId(Guid propertyId)
         {
-            var propertyPhotos = context.Where(x => x.PhotoId == photoid).ToList();
-            return propertyPhotos;
+            var count= context.Where(p=>p.PropertyId == propertyId).Count();
+            return count;
         }
     }
 }

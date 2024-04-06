@@ -20,7 +20,11 @@ namespace Domain.Mappings
 
             CreateMap<PropertyDTO, Property>()
            .ForMember(dest => dest.CategoryType, opt => opt.MapFrom(src => src.CategoryType.ToString()));
+
+            CreateMap<Photo, PhotoDTO>().ReverseMap();
         } 
+
+        
 
         #endregion
     }

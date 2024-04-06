@@ -23,6 +23,7 @@ namespace Entities.Models
         public virtual DbSet<Reservation> Reservations { get; set; } = null!;
         public virtual DbSet<Role> Roles { get; set; } = null!;
         public virtual DbSet<User> Users { get; set; } = null!;
+        public virtual DbSet<UserRole> UserRoles { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -65,9 +66,15 @@ namespace Entities.Models
 
             modelBuilder.Entity<Photo>(entity =>
             {
-                entity.Property(e => e.PhotoId).ValueGeneratedNever();
+                entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
 
-                entity.Property(e => e.Photos).HasColumnType("image");
+                entity.Property(e => e.Path).HasMaxLength(255);
+
+                entity.HasOne(d => d.Property)
+                    .WithMany(p => p.Photos)
+                    .HasForeignKey(d => d.PropertyId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__Photos__Property__31B762FC");
             });
 
             modelBuilder.Entity<Property>(entity =>
@@ -75,6 +82,10 @@ namespace Entities.Models
                 entity.ToTable("Property");
 
                 entity.Property(e => e.PropertyId).ValueGeneratedNever();
+
+                entity.Property(e => e.CategoryType)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.Description)
                     .HasMaxLength(200)
@@ -85,11 +96,6 @@ namespace Entities.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.Price).HasColumnType("decimal(10, 2)");
-
-                entity.HasOne(d => d.Photo)
-                    .WithMany(p => p.Properties)
-                    .HasForeignKey(d => d.PhotoId)
-                    .HasConstraintName("FK_PhotoId");
             });
 
             modelBuilder.Entity<Reservation>(entity =>
@@ -110,6 +116,8 @@ namespace Entities.Models
 
             modelBuilder.Entity<Role>(entity =>
             {
+                entity.ToTable("Role");
+
                 entity.Property(e => e.RoleId).ValueGeneratedNever();
 
                 entity.Property(e => e.RoleName)
@@ -133,10 +141,6 @@ namespace Entities.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.Password)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
                 entity.Property(e => e.Username)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -149,23 +153,24 @@ namespace Entities.Models
                         r => r.HasOne<User>().WithMany().HasForeignKey("UserId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__UserPrope__UserI__398D8EEE"),
                         j =>
                         {
-                            j.HasKey("UserId", "PropertyId").HasName("PK__UserProp__5084563F4CDE4D28");
+                            j.HasKey("UserId", "PropertyId").HasName("PK__UserProp__5084563F8B776668");
 
                             j.ToTable("UserProperty");
                         });
+            });
 
-                entity.HasMany(d => d.Roles)
-                    .WithMany(p => p.Users)
-                    .UsingEntity<Dictionary<string, object>>(
-                        "UserRole",
-                        l => l.HasOne<Role>().WithMany().HasForeignKey("RoleId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__User_Role__RoleI__36B12243"),
-                        r => r.HasOne<User>().WithMany().HasForeignKey("UserId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__User_Role__UserI__37A5467C"),
-                        j =>
-                        {
-                            j.HasKey("UserId", "RoleId").HasName("PK__User_Rol__AF2760AD43E0C3C8");
+            modelBuilder.Entity<UserRole>(entity =>
+            {
+                entity.HasKey(e => new { e.UserId, e.RoleId })
+                    .HasName("PK__UserRole__AF2760ADD626EEC5");
 
-                            j.ToTable("User_Roles");
-                        });
+                entity.ToTable("UserRole");
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.UserRoles)
+                    .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__UserRole__UserId__09A971A2");
             });
 
             OnModelCreatingPartial(modelBuilder);

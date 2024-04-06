@@ -16,6 +16,7 @@ namespace DAL.DI
             IncludeRegistry<UnitOfWorkRegistry>();
 
             For<IPropertyRepository>().Use<PropertyRepository>();
+            For<IPhotoRepository>().Use<PhotoRepository>();
         }
 
 

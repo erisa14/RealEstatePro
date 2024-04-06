@@ -3,9 +3,11 @@ using System.Collections.Generic;
 
 namespace Entities.Models
 {
-    public partial class Role
+    public partial class UserRole
     {
-        public string RoleName { get; set; } = null!;
+        public Guid UserId { get; set; }
         public int RoleId { get; set; }
+
+        public virtual User User { get; set; } = null!;
     }
 }
