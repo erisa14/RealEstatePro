@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Entities.Models;
 using Lamar;
+using Microsoft.EntityFrameworkCore;
 
 namespace DAL.UoW
 {
@@ -12,9 +13,9 @@ namespace DAL.UoW
     {
         private readonly IContainer _container;
 
-        private readonly RecrutimentContext _context;
+        private readonly RealEstateContext _context;
 
-        public UnitOfWork(IContainer container, RecrutimentContext context)
+        public UnitOfWork(IContainer container, RealEstateContext context)
         {
             _container = container;
             _context = context;

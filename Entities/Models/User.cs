@@ -7,25 +7,21 @@ namespace Entities.Models
     {
         public User()
         {
-            Certificates = new HashSet<Certificate>();
-            Educations = new HashSet<Education>();
-            Jobs = new HashSet<Job>();
-            Projects = new HashSet<Project>();
-            Roles = new HashSet<Role>();
+            Notifications = new HashSet<Notification>();
+            UserRoles = new HashSet<UserRole>();
+            Properties = new HashSet<Property>();
         }
 
         public Guid UserId { get; set; }
-        public string FirstName { get; set; } = null!;
-        public string Username { get; set; } = null!;
+        public string Name { get; set; } = null!;
         public string LastName { get; set; } = null!;
-        public DateTime Dob { get; set; }
-        public string Password { get; set; } = null!;
-        public int Status { get; set; }
+        public string Email { get; set; } = null!;
+        public string Username { get; set; } = null!;
+        public string? Password { get; set; }
 
-        public virtual ICollection<Certificate> Certificates { get; set; }
-        public virtual ICollection<Education> Educations { get; set; }
-        public virtual ICollection<Job> Jobs { get; set; }
-        public virtual ICollection<Project> Projects { get; set; }
-        public virtual ICollection<Role> Roles { get; set; }
+        public virtual ICollection<Notification> Notifications { get; set; }
+        public virtual ICollection<UserRole> UserRoles { get; set; }
+
+        public virtual ICollection<Property> Properties { get; set; }
     }
 }

@@ -14,8 +14,7 @@ namespace DAL.DI
         public RepositoryRegistry()
         {
             IncludeRegistry<UnitOfWorkRegistry>();
-
-            For<IUserRepository>().Use<UserRepository>();
+            For<INotificiationRepository>().Use<NotificationRepository>();
         }
 
 

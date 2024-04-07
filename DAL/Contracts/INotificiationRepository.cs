@@ -7,8 +7,7 @@ using System.Threading.Tasks;
 
 namespace DAL.Contracts
 {
-    public interface IUserRepository: IRepository<User, Guid>
+    public interface INotificiationRepository : IRepository<Notification, Guid>
     {
-        User GetById(Guid id);
     }
 }
