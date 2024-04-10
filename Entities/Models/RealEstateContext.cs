@@ -66,9 +66,15 @@ namespace Entities.Models
 
             modelBuilder.Entity<Photo>(entity =>
             {
-                entity.Property(e => e.PhotoId).ValueGeneratedNever();
+                entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
 
-                entity.Property(e => e.Photos).HasColumnType("image");
+                entity.Property(e => e.Path).HasMaxLength(255);
+
+                entity.HasOne(d => d.Property)
+                    .WithMany(p => p.Photos)
+                    .HasForeignKey(d => d.PropertyId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__Photos__Property__31B762FC");
             });
 
             modelBuilder.Entity<Property>(entity =>
@@ -76,6 +82,10 @@ namespace Entities.Models
                 entity.ToTable("Property");
 
                 entity.Property(e => e.PropertyId).ValueGeneratedNever();
+
+                entity.Property(e => e.CategoryType)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.Description)
                     .HasMaxLength(200)
@@ -86,12 +96,6 @@ namespace Entities.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.Price).HasColumnType("decimal(10, 2)");
-
-                entity.HasOne(d => d.Photo)
-                    .WithMany(p => p.Properties)
-                    .HasForeignKey(d => d.PhotoId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_PhotoId");
             });
 
             modelBuilder.Entity<Reservation>(entity =>

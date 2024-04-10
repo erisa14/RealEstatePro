@@ -5,14 +5,11 @@ namespace Entities.Models
 {
     public partial class Photo
     {
-        public Photo()
-        {
-            Properties = new HashSet<Property>();
-        }
+        public Guid Id { get; set; }
+        public string Path { get; set; } = null!;
+        public byte[] Data { get; set; } = null!;
+        public Guid PropertyId { get; set; }
 
-        public Guid PhotoId { get; set; }
-        public byte[] Photos { get; set; } = null!;
-
-        public virtual ICollection<Property> Properties { get; set; }
+        public virtual Property Property { get; set; } = null!;
     }
 }

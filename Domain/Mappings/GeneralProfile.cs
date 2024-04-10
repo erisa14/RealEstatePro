@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
+using DTO.Property;
 using DTO.UserDTO;
 using Entities.Models;
+using LamarCodeGeneration.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,10 +23,21 @@ namespace Domain.Mappings
             CreateMap<RegisterDto, User>().ForMember(dest => dest.UserRoles, opt => opt.Ignore());
 
 
-        }
 
+
+            CreateMap<Property, EditPropertyDTO>().ReverseMap();
+            CreateMap<Property, PropertyDTO>().ReverseMap();
+
+            CreateMap<PropertyDTO, Property>()
+           .ForMember(dest => dest.CategoryType, opt => opt.MapFrom(src => src.CategoryType.ToString()));
+
+            CreateMap<Photo, PhotoDTO>().ReverseMap();
+        }
         #endregion
 
-
+        
+        
+            
+        
     }
 }

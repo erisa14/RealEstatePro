@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Domain.Mappings;
 using Lamar;
+using LamarCodeGeneration.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;

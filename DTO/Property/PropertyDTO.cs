@@ -31,7 +31,7 @@ namespace DTO.Property
 
             //public int Status { get; set; }
 
-            //  [Required(ErrorMessage = "Please upload at least 5 photos!")]
-            // public Guid PhotoId { get; set; }
+            //[Required(ErrorMessage = "Please upload at least 5 photos!")]
+            //public List<PhotoDTO> Photos { get; set; }
         }
     }

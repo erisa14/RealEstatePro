@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace Domain.Concrete
 {
-    public class DomainBase
+    internal class DomainBase
     {
         protected readonly IUnitOfWork _unitOfWork;
         protected readonly IMapper _mapper;

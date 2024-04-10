@@ -17,7 +17,7 @@ namespace DAL.Concrete
 
         public int CountByPropertyId(Guid propertyId)
         {
-            var count = context.Where(p => p.PropertyId == propertyId).Count();
+            var count= context.Where(p=>p.PropertyId == propertyId).Count();
             return count;
         }
     }

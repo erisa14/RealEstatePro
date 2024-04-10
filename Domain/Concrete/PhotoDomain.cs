@@ -29,8 +29,8 @@ namespace Domain.Concrete
 
         public async Task UploadImageAsync(PhotoDTO photoDTO)
         {
-
-            var property = propertyRepository.GetById(photoDTO.PropertyId);
+           
+            var property =  propertyRepository.GetById(photoDTO.PropertyId);
             if (property == null)
             {
                 throw new Exception("The referenced property does not exist.");

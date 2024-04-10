@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace Domain.Concrete
 {
-    public class AuthDomain : DomainBase, IAuthDomain
+    internal class AuthDomain : DomainBase, IAuthDomain
     {
 
         private readonly Jwt _jwt;

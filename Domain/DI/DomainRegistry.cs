@@ -1,12 +1,8 @@
 ﻿using DAL.DI;
 using Domain.Concrete;
 using Domain.Contracts;
-using Entities.Models;
 using Lamar;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,6 +21,10 @@ namespace Domain.DI
             For<IAuthDomain>().Use<AuthDomain>();
            
 
+            For<IPropertyDomain>().Use<PropertyDomain>();
+            For<IPhotoDomain>().Use<PhotoDomain>();
+
+
             AddRepositoryRegistries();
             AddHttpContextRegistries();
         }
@@ -40,3 +40,4 @@ namespace Domain.DI
         }
     }
 }
+

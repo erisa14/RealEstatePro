@@ -90,7 +90,7 @@ namespace RealEstatePro.Controllers
         public async Task<ActionResult<List<Property>>> GetAllPropertiesByCategory(CategoryEnum.CategoryName categoryName)
         {
 
-            var properties = await _propertyDomain.GetPropertyByCategory(categoryName);
+           var properties= await _propertyDomain.GetPropertyByCategory(categoryName);
             return properties;
         }
 
@@ -100,12 +100,12 @@ namespace RealEstatePro.Controllers
         [Route("getAllPropertiesByPrice")]
         public async Task<ActionResult<List<Property>>> GetAllPropertiesByPrice(decimal minPrice, decimal maxPrice)
 
-        {
-            var properties = await _propertyDomain.GetAllPropertiesByPrice(minPrice, maxPrice);
+        { 
+            var properties =await _propertyDomain.GetAllPropertiesByPrice(minPrice, maxPrice);
             return properties;
 
 
-
+           
         }
 
         /*
@@ -133,32 +133,32 @@ namespace RealEstatePro.Controllers
         */
 
 
-
+        
         [HttpDelete]
         [Route("deleteProperty")]
         public async Task<IActionResult> DeleteProperty(Guid PropertyId)
         {
-            await _propertyDomain.DeleteProperty(PropertyId);
+           await _propertyDomain.DeleteProperty(PropertyId);
             return Ok();
         }
 
 
         [HttpPost]
         [Route("addProperty")]
-        public async Task<IActionResult> AddProperty([FromBody] PropertyDTO propertyDTO)
+        public async Task<IActionResult> AddProperty([FromBody]PropertyDTO propertyDTO)
         {
             try
             {
                 await _propertyDomain.AddProperty(propertyDTO);
                 return Ok("Property registered!");
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 return BadRequest(new { message = ex.Message });
             }
 
         }
-
+        
         [HttpPost]
         [Route("editProperty")]
         public IActionResult EditProperty(EditPropertyDTO propertyDTO)
@@ -186,12 +186,12 @@ namespace RealEstatePro.Controllers
         [HttpPost]
         public async Task<IActionResult> AddPhotoAsync([FromForm] PhotoDTO photoDTO)
         {
-            if (ModelState.IsValid)
+            if(ModelState.IsValid)
             {
                 await _photoDomain.UploadImageAsync(photoDTO);
                 return Ok("Image uploaded successfully.");
 
-                // return NoContent();
+               // return NoContent();
             }
             else
             {
@@ -200,3 +200,7 @@ namespace RealEstatePro.Controllers
         }
     }
 }
+
+
+
+

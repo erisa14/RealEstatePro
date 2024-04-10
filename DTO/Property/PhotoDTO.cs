@@ -15,7 +15,7 @@ namespace DTO.Property
         [DataType(DataType.Upload)]
         public List<IFormFile> ImageFile { get; set; }
 
-        public Guid PropertyId { get; set; }
+        public Guid PropertyId {  get; set; }
 
     }
 }
