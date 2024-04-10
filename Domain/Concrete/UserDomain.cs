@@ -14,7 +14,7 @@ using System.Security.Claims;
 
 namespace Domain.Concrete
 {
-    public class UserDomain : DomainBase, IUserDomain
+    internal class UserDomain : DomainBase, IUserDomain
     {
         private readonly Jwt _jwt;
         private readonly ClaimsPrincipal _user;
