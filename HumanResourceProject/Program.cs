@@ -36,8 +36,12 @@ builder.Services.AddAutoMapper(typeof(GeneralProfile));
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", b => b.AllowAnyMethod().AllowAnyHeader().AllowAnyOrigin());
+    options.AddPolicy("AllowSpecificOrigin",
+        builder => builder.WithOrigins("http://localhost:4200")
+                          .AllowAnyMethod()
+                          .AllowAnyHeader());
 });
+
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -110,7 +114,8 @@ app.UseAuthentication();
 
 app.UseAuthorization();
 
-
 app.MapControllers();
+
+app.UseCors("AllowSpecificOrigin");
 
 app.Run();
