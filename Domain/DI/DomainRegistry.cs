@@ -17,6 +17,10 @@ namespace Domain.DI
         {
             IncludeRegistry<DomainUnitOfWorkRegistry>();
 
+            For<IUserDomain>().Use<UserDomain>();
+            For<IAuthDomain>().Use<AuthDomain>();
+           
+
             For<IPropertyDomain>().Use<PropertyDomain>();
             For<IPhotoDomain>().Use<PhotoDomain>();
 

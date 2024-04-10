@@ -12,14 +12,10 @@ namespace Domain.Mappings
 {
     public class GeneralProfile : Profile
     {
-        #region Property
-
-        public GeneralProfile() {
-        CreateMap<Property,EditPropertyDTO>().ReverseMap();
-        CreateMap<Property,PropertyDTO>().ReverseMap();
-
-            CreateMap<PropertyDTO, Property>()
-           .ForMember(dest => dest.CategoryType, opt => opt.MapFrom(src => src.CategoryType.ToString()));
+        #region User
+        public GeneralProfile()
+        {
+           CreateMap<User, UserDTO>().ReverseMap();
 
             CreateMap<Photo, PhotoDTO>().ReverseMap();
         } 
