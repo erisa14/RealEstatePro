@@ -28,6 +28,8 @@ namespace DAL.Concrete
             var userRoles = context.Where(a => a.UserId == userId).ToList();
             return userRoles;
          }
-        
+
+
+
     }
 }

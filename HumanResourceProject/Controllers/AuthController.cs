@@ -24,11 +24,11 @@ namespace RealEstateProProject.Controllers
             try
             {
                 await _authDomain.Register(request);
-                return Ok("User registered!");
+                return Ok(new { message = "User registered!" });
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { error = ex.Message });
             }
         }
 
@@ -41,7 +41,8 @@ namespace RealEstateProProject.Controllers
 
             if (response != null)
             {
-                return Ok(response);
+                // return Ok(response);
+                return Ok(new { response = response });
 
             }
 

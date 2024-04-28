@@ -73,13 +73,16 @@ namespace HumanResourceProject.Controllers
             }
         }
 
-        [Authorize]
+        
         [HttpPut("update")]
         public async Task<IActionResult> UpdateUser([FromBody] UserDTO userDTO)
         {
             
-                await _userDomain.UpdateUser(User, userDTO);
-                return Ok(); 
+               await _userDomain.UpdateUser(userDTO);
+                
+                return Ok();
+
+            
         }
 
 
@@ -89,7 +92,7 @@ namespace HumanResourceProject.Controllers
         {
             try
             {
-                await _userDomain.RemoveRoleFromUser(User, roleId);
+                await _userDomain.RemoveRoleFromUser(roleId);
                 return Ok();
             }
             catch (UnauthorizedAccessException ex)
@@ -104,7 +107,7 @@ namespace HumanResourceProject.Controllers
         {
             try
             {
-                await _userDomain.DeleteUserAccount(User);
+                await _userDomain.DeleteUserAccount();
                 return Ok();
             }
             catch (UnauthorizedAccessException ex)
@@ -114,41 +117,6 @@ namespace HumanResourceProject.Controllers
             }
         }
 
-
-
-        /*
-        [HttpPost]
-        [Route("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterDto request)
-        {
-            try
-            {
-                await _userDomain.Register(request);
-                return Ok("User registered!");
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
-        [HttpPost]
-        [Route("login")]
-        public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
-        {
-            var response = await _userDomain.Login(loginDto);
-
-            
-            if (response != null)
-            {
-                return Ok(response);
-
-            }
-
-            return BadRequest(new { message = "User login unsuccessful" });
-        }
-
-        */
 
 
         [HttpGet]

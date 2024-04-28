@@ -13,17 +13,15 @@ namespace Domain.Contracts
 {
     public interface IUserDomain
     {
-        //Task Register(RegisterDto registerDto);
-        //Task<string> Login(LoginDto loginDto);
         IList<UserDTO> GetAllUsers();
         UserDTO GetUserById(Guid id);
         UserDTO GetUserByEmail(string email);
-        Task UpdateUser(ClaimsPrincipal userClaims, UserDTO userDTO);
+        Task UpdateUser(UserDTO userDTO);
 
-        Task RemoveRoleFromUser(ClaimsPrincipal userClaims, int roleId);
+        Task RemoveRoleFromUser(int roleId);
 
 
-        Task DeleteUserAccount(ClaimsPrincipal userClaims);
+        Task DeleteUserAccount();
         Task<List<User>> GetUsersByRole(int roleId);
     }
 }

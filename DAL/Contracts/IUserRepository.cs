@@ -7,9 +7,17 @@ using System.Threading.Tasks;
 
 namespace DAL.Contracts
 {
-    public interface IPhotoRepository : IRepository<Photo, Guid>
+   
+    public interface IUserRepository : IRepository<User, Guid>
     {
-        int CountByPropertyId(Guid propertyId);
+        User GetById(Guid id);
 
+        User GetByEmail(string email);
+
+        void AddUserWithRoles(User user, IEnumerable<UserRole> roles);
+
+        Task<List<User>> GetUsersByRoleAsync(int roleId);
+
+        void RemoveRoleFromUser(User user, int roleId);
     }
 }

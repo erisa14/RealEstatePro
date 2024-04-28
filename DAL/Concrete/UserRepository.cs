@@ -44,5 +44,12 @@ namespace DAL.Concrete
 
             return users;
         }
+
+        public void RemoveRoleFromUser(User user, int roleId)
+        {
+            var userRole = user.UserRoles.FirstOrDefault(ur => ur.RoleId == roleId);           
+            user.UserRoles.Remove(userRole);
+            
+        }
     }
 }

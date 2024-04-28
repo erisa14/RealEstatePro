@@ -6,11 +6,12 @@ using DTO.UserDTO;
 using Entities.Models;
 using Helpers;
 using Helpers.JwToken;
-using Lamar.IoC.Instances;
+using LamarCodeGeneration.Util;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using System.Security.Claims;
-
+using Helpers.TokenConverter;
+using static Microsoft.AspNetCore.Hosting.Internal.HostingApplication;
 
 namespace Domain.Concrete
 {
@@ -18,11 +19,10 @@ namespace Domain.Concrete
     {
         private readonly Jwt _jwt;
         private readonly ClaimsPrincipal _user;
-        public UserDomain(IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor, IConfiguration configuration, ClaimsPrincipal user)
+        public UserDomain(IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor, IConfiguration configuration)
             : base(unitOfWork, mapper, httpContextAccessor)
         {
             _jwt = new Jwt(configuration);
-            _user = user;
         }
 
         private IUserRepository userRepository => _unitOfWork.GetRepository<IUserRepository>();
@@ -47,21 +47,37 @@ namespace Domain.Concrete
             return _mapper.Map<UserDTO>(user);
         }
 
-        private User getUser(string userId)
+        private User getUser()
         {
-            var user = userRepository.GetById(Guid.Parse(userId));
-            if (user == null) throw new UnauthorizedAccessException("User not found.");
+            var userIdClaim = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
+            Guid userId;
+            if (userIdClaim != null)
+            {
+                userId = ClaimConvert.ConvertGuid(userIdClaim);
+            }
+            else
+            {
+                throw new Exception("User doesn't exist");
+            }
+            var user = userRepository.GetById(userId);
             return user;
         }
 
-        public async Task UpdateUser(ClaimsPrincipal userClaims, UserDTO userDTO)
+        public async Task UpdateUser(UserDTO userDTO)
         {
-            var userId = userClaims.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-            if (userId == null) throw new UnauthorizedAccessException("User not found.");
+            var userIdClaim = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
+            Guid userId;
+            if (userIdClaim != null)
+            {
+                userId=ClaimConvert.ConvertGuid(userIdClaim);
+            }
+            else
+            {
+                throw new Exception("User doesn't exist");
+            }
 
-            var user = getUser(userId);
-
-            _mapper.Map(userDTO, user);
+            User user=userRepository.GetById(userId);
+            user = _mapper.Map<UserDTO, User>(userDTO, user);
 
             if(!string.IsNullOrEmpty(userDTO.NewPassword)&& !string.IsNullOrEmpty(userDTO.ConfirmPassword))
             {
@@ -104,33 +120,53 @@ namespace Domain.Concrete
 
         }
 
-        public async Task RemoveRoleFromUser(ClaimsPrincipal userClaims, int roleId)
+        public async Task RemoveRoleFromUser(int roleId)
         {
-            var userId = userClaims.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-            if (userId == null) throw new UnauthorizedAccessException("User not found.");
+            var claimId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
+            Guid userId;
+            if (claimId != null)
+            {
+                userId = ClaimConvert.ConvertGuid(claimId);
+            }
+            else
+            {
+                throw new Exception("User doesn't exist");
+            }
 
-            var user =  userRepository.GetById(Guid.Parse(userId));
-            if (user == null) throw new Exception("User not found.");
-
-            var role =  roleRepository.GetById(roleId);
-            if (role == null) throw new Exception("Role not found.");
+            User user = userRepository.GetById(userId);
+            var role = roleRepository.GetById(roleId);
 
             user.UserRoles.Remove(role);
-
-            userRepository.Update(user);
             _unitOfWork.Save();
+
         }
 
-        public async Task DeleteUserAccount(ClaimsPrincipal userClaims)
-        {
-            var userId = userClaims.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-            if (userId == null) throw new UnauthorizedAccessException("User not found.");
 
-            var user =  userRepository.GetById(Guid.Parse(userId));
-            if (user == null) throw new Exception("User not found.");
+
+        public async Task DeleteUserAccount()
+        {
+            var userIdClaim = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
+            Guid userId;
+            if (userIdClaim != null)
+            {
+                userId = ClaimConvert.ConvertGuid(userIdClaim);
+            }
+            else
+            {
+                throw new Exception("User doesn't exist");
+            }
+            var user = userRepository.GetById(userId);
+
+            var userRoles = user.UserRoles;
+            foreach (var role in userRoles)
+            {
+                roleRepository.Remove(role);
+            }
+            _unitOfWork.Save();
 
             userRepository.Remove(user);
             _unitOfWork.Save();
         }
+
     }
 }
